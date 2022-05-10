@@ -1,0 +1,21 @@
+format: AABBCCCDD (full 251 progs)
+
+AA = type of progression
+
+BB = what note (C = 00, Db = 01 etc)
+
+CCC = tempo in bpm
+
+DD = what layer (bass, piano etc)
+
+
+
+AABBCCCDD (single chords)
+
+same as above but AA is now the chord quality:
+00 = major tonic
+01 = minor tonic
+02 = dominant
+03 = minor 2
+04 = halfdim 2
+05 = secondary dominant
