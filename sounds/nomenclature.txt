@@ -6,7 +6,7 @@ BB = what note (C = 00, Db = 01 etc)
 
 CCC = tempo in bpm
 
-DD = what layer (bass, piano etc)
+DD = what layer (bass = 00, piano = 01, )
 
 
 
@@ -18,4 +18,5 @@ same as above but AA is now the chord quality:
 02 = dominant
 03 = minor 2
 04 = halfdim 2
-05 = secondary dominant
+
+NOTE THE NUMBER AT THE END MIGHT BECOME THE TRACK NUMBER I.E. IF I HAVE N VERSIONS OF A TONIC BASS CHORD

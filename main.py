@@ -5,27 +5,90 @@ import random
 import time
 from threading import Thread
 
-#GLITCH: if you stop, play() is still in sleep, if you play() again before sleep is over it glitches out
+#MAJOR ISSUES:
+#
 
-def listcycle(lista):
+#ISSUES:
+#if you stop, play() is still in sleep, if you play() again before sleep is over it glitches out
 
-    length = len(lista)
-    newlist = lista
+#MINOR ISSUES:
+#Bbm7 doesn't fit in the small boxes
 
-    for i in range(1, length):
-        newlist [i - 1] = lista[i]
+#TODO:
+#think of new nomenclature (don't really need the 01 for instrument at the end, so could use it for different versions of the same chord)
+#think of how to record better music (chord changes are too abrupt)
+#fix Bbm7 issue
+#start working on option menu .-.
+#pause button
+#record minor tonics and stuff
 
-    return newlist
+def randomtruefromboollist(lista, seed, howmanyallows):
+    random.seed(seed)
+    true_indices = [index for index,element in enumerate(lista) if element]
+    result = random.choice(true_indices)
+    return result
 
-def filepath2chords(filepath):
+def bassvolumebutton(location, volume, mouse, instr_font, volume_font):
 
-    if filepath[0:2] == "00":
-        min_second = notes[(int(filepath[2:4]) + 2) %12] + "m"
-        dominant = notes[(int(filepath[2:4]) + 7) %12] + "7"
-        tonic = notes[int(filepath[2:4]) %12]
-        chords = [min_second, dominant, tonic]
+    l_0 = location[0]
+    l_1 = location[1]
 
-    return chords
+    vol_str = str(volume)
+
+    instr_text = instr_font.render("Bass", 1, BLACK)
+    vol_text = volume_font.render(vol_str, 1, BLACK)
+
+    pygame.draw.polygon(surface, WHITE, [(l_0, l_1),(l_0, 70 + l_1),(140 + l_0, 70 + l_1),(140 + l_0, l_1)])
+    surface.blit(instr_text, instr_text.get_rect(center = (l_0 + 70, l_1 + 35)))
+    pygame.draw.polygon(surface, WHITE, [(180 + l_0, l_1),(180 + l_0, 70  + l_1),(240 + l_0, 70 + l_1),(240 + l_0, l_1)])
+    surface.blit(vol_text, vol_text.get_rect(center = (l_0 + 210, l_1 + 35)))
+
+    global bassonplus_bool
+    global bassonminus_bool
+    bassonplus_bool = (250 <= mouse[0] - location[0] <= 270) and (25 <= mouse[1] - location[1] <= 45)
+    bassonminus_bool = (150 <= mouse[0] - location[0] <= 170) and (25 <= mouse[1] - location[1] <= 45)
+    if bassonplus_bool:
+        pygame.draw.polygon(surface, BLACK, [(150 + l_0, 35 + l_1),(170 + l_0, 25 + l_1),(170 + l_0, 45 + l_1)])
+        pygame.draw.polygon(surface, WHITE, [(270 + l_0, 35 + l_1),(250 + l_0, 25 + l_1),(250 + l_0, 45 + l_1)])
+        pygame.draw.polygon(surface, BLACK, [(270 + l_0, 35 + l_1),(250 + l_0, 25 + l_1),(250 + l_0, 45 + l_1)], width=1)
+    elif bassonminus_bool:
+        pygame.draw.polygon(surface, BLACK, [(270 + l_0, 35 + l_1),(250 + l_0, 25 + l_1),(250 + l_0, 45 + l_1)])
+        pygame.draw.polygon(surface, WHITE, [(150 + l_0, 35 + l_1),(170 + l_0, 25 + l_1),(170 + l_0, 45 + l_1)])
+        pygame.draw.polygon(surface, BLACK, [(150 + l_0, 35 + l_1),(170 + l_0, 25 + l_1),(170 + l_0, 45 + l_1)], width=1)
+    else:
+        pygame.draw.polygon(surface, BLACK, [(150 + l_0, 35 + l_1),(170 + l_0, 25 + l_1),(170 + l_0, 45 + l_1)])
+        pygame.draw.polygon(surface, BLACK, [(270 + l_0, 35 + l_1),(250 + l_0, 25 + l_1),(250 + l_0, 45 + l_1)])
+
+def pianovolumebutton(location, volume, mouse, instr_font, volume_font):
+
+    l_0 = location[0]
+    l_1 = location[1]
+
+    vol_str = str(volume)
+
+    instr_text = instr_font.render("Piano", 1, BLACK)
+    vol_text = volume_font.render(vol_str, 1, BLACK)
+
+    pygame.draw.polygon(surface, WHITE, [(l_0, l_1),(l_0, 70 + l_1),(140 + l_0, 70 + l_1),(140 + l_0, l_1)])
+    surface.blit(instr_text, instr_text.get_rect(center = (l_0 + 70, l_1 + 35)))
+    pygame.draw.polygon(surface, WHITE, [(180 + l_0, l_1),(180 + l_0, 70  + l_1),(240 + l_0, 70 + l_1),(240 + l_0, l_1)])
+    surface.blit(vol_text, vol_text.get_rect(center = (l_0 + 210, l_1 + 35)))
+
+    global pianoonplus_bool
+    global pianoonminus_bool
+    pianoonplus_bool = (250 <= mouse[0] - location[0] <= 270) and (25 <= mouse[1] - location[1] <= 45)
+    pianoonminus_bool = (150 <= mouse[0] - location[0] <= 170) and (25 <= mouse[1] - location[1] <= 45)
+    if pianoonplus_bool:
+        pygame.draw.polygon(surface, BLACK, [(150 + l_0, 35 + l_1),(170 + l_0, 25 + l_1),(170 + l_0, 45 + l_1)])
+        pygame.draw.polygon(surface, WHITE, [(270 + l_0, 35 + l_1),(250 + l_0, 25 + l_1),(250 + l_0, 45 + l_1)])
+        pygame.draw.polygon(surface, BLACK, [(270 + l_0, 35 + l_1),(250 + l_0, 25 + l_1),(250 + l_0, 45 + l_1)], width=1)
+    elif pianoonminus_bool:
+        pygame.draw.polygon(surface, BLACK, [(270 + l_0, 35 + l_1),(250 + l_0, 25 + l_1),(250 + l_0, 45 + l_1)])
+        pygame.draw.polygon(surface, WHITE, [(150 + l_0, 35 + l_1),(170 + l_0, 25 + l_1),(170 + l_0, 45 + l_1)])
+        pygame.draw.polygon(surface, BLACK, [(150 + l_0, 35 + l_1),(170 + l_0, 25 + l_1),(170 + l_0, 45 + l_1)], width=1)
+    else:
+        pygame.draw.polygon(surface, BLACK, [(150 + l_0, 35 + l_1),(170 + l_0, 25 + l_1),(170 + l_0, 45 + l_1)])
+        pygame.draw.polygon(surface, BLACK, [(270 + l_0, 35 + l_1),(250 + l_0, 25 + l_1),(250 + l_0, 45 + l_1)])
 
 def drawchords(chords):
 
@@ -47,55 +110,195 @@ def drawchords(chords):
     surface.blit(chord_next2, chord_next2.get_rect(center = (940,350)))
     surface.blit(chord_next3, chord_next3.get_rect(center = (1140,350)))
 
+def listcycle(lista):
+
+    length = len(lista)
+    newlist = lista
+    newlist[-1] = ""
+
+    for i in range(1, length):
+        newlist [i - 1] = lista[i]
+
+    return newlist
+
+def findfirstempty(lista):
+    #finds the first empty string in a list of strings and returns its index
+    #returns -1 if there is no such element
+
+    for i in lista:
+        if i == "":
+            return index(i)
+
+    return -1
+
+def keype2namelist(key_251, type_251):
+    chordsnow = ["", "", ""]
+    indiv_types = types[type_251]
+    types_symbols = [type2str[i] for i in indiv_types]
+    chordsnow[-1] = notes[key_251] + types_symbols[-1]
+    chordsnow[-2] = notes[(key_251 + 7) %12] + types_symbols[-2]
+    if len(types_symbols) == 3:
+        chordsnow[-3] = notes[(key_251 + 2) %12] + types_symbols[-3]
+    return chordsnow
+
+def keype2filenamelist(key_251, type_251, tempo, instrument):
+    chordfilesnow = ["", "", ""]
+    indiv_types = types[type_251]
+    chordfilesnow[-1] = str(indiv_types[-1]).zfill(2) + str(key_251).zfill(2) + str(tempo).zfill(3) + str(instrument).zfill(2)
+    chordfilesnow[-2] = str(indiv_types[-2]).zfill(2) + str((key_251 + 7) % 12).zfill(2) + str(tempo).zfill(3) + str(instrument).zfill(2)
+    if len(indiv_types) == 3:
+        chordfilesnow[-3] = str(indiv_types[-3]).zfill(2) + str((key_251 + 2) % 12).zfill(2) + str(tempo).zfill(3) + str(instrument).zfill(2)
+    return chordfilesnow
+
 def play(seed):
 
-    random.seed(seed)
-    typeof251 = random.randrange(0, howmanyallows)
-    keyof251 = random.randrange(0, 12)
-    bass_name = str(typeof251).zfill(2) + str(keyof251).zfill(2) + str(tempo).zfill(3) + "00.wav"
-    bass_file = os.path.join(script_dir,"sounds","full_progs",bass_name)
-    bass_sound = pygame.mixer.Sound(bass_file)
-    chordsnow = filepath2chords(bass_name)
-    chords = ["", chordsnow[0], chordsnow[1], chordsnow[2], ""]
+    global bass_volume
+    global piano_volume
 
-    bass.play(bass_sound)
-    seed = random.randrange(0, 16384)
     random.seed(seed)
-    typeof251 = random.randrange(0, howmanyallows)
-    keyof251 = random.randrange(0, 12)
-    bass_name = str(typeof251).zfill(2) + str(keyof251).zfill(2) + str(tempo).zfill(3) + "00.wav"
-    chordsnow = filepath2chords(bass_name)
-    chords[4] = chordsnow[0]
+
+    true_indices = [index for index,element in enumerate(allowed_types) if element]
+    typeof251 = random.choice(true_indices)
+
+    keyof251 = starting_key
+
+    chordnames = ["sup", "", "", "", "", "", "", "", ""]
+    basschordfilenames = ["", "", "", "", "", "", "", "", ""]
+    pianochordfilenames = ["", "", "", "", "", "", "", "", ""]
+
+    chordnames[1:4] = keype2namelist(keyof251, typeof251)
+    basschordfilenames[1:4] = keype2filenamelist(keyof251, typeof251, tempo, 0)
+    pianochordfilenames[1:4] = keype2filenamelist(keyof251, typeof251, tempo, 1)
+
+
+    seed = random.randrange(0, 65535)
+    random.seed(seed)
+    typeof251 = random.choice(true_indices)
+
+    upfifth = keyof251
+    downfifth = keyof251
+    fifthfilter = [keyof251]
+    if fifth_distance != 0:
+        for i in range(fifth_distance - 1):
+            upfifth = (upfifth + 7) % 12
+            downfifth = (downfifth - 7) % 12
+            fifthfilter.append(upfifth)
+            fifthfilter.append(downfifth)
+
+    upsemit = keyof251
+    downsemit = keyof251
+    semitfilter = [keyof251]
+    if semitone_distance != 0:
+        for i in range(semitone_distance - 1):
+            upsemit = (upsemit + 1) % 12
+            downsemit = (downsemit - 1) % 12
+            semitfilter.append(upsemit)
+            semitfilter.append(downsemit)
+
+    possiblekeys = [i for i in fifthfilter if i in semitfilter]
+    keyof251 = random.choice(possiblekeys)
+
+    if chordnames[3] == "":
+        chordnames[3:6] = keype2namelist(keyof251, typeof251)
+        basschordfilenames[3:6] = keype2filenamelist(keyof251, typeof251, tempo, 0)
+        pianochordfilenames[3:6] = keype2filenamelist(keyof251, typeof251, tempo, 1)
+    else:
+        chordnames[4:7] = keype2namelist(keyof251, typeof251)
+        basschordfilenames[4:7] = keype2filenamelist(keyof251, typeof251, tempo, 0)
+        pianochordfilenames[4:7] = keype2filenamelist(keyof251, typeof251, tempo, 1)
+
+
+    if chordnames[5] == "":
+        seed = random.randrange(0, 65535)
+        random.seed(seed)
+        typeof251 = random.choice(true_indices)
+
+        upfifth = keyof251
+        downfifth = keyof251
+        fifthfilter = [keyof251]
+        if fifth_distance != 0:
+            for i in range(fifth_distance - 1):
+                upfifth = (upfifth + 7) % 12
+                downfifth = (downfifth - 7) % 12
+                fifthfilter.append(upfifth)
+                fifthfilter.append(downfifth)
+
+        upsemit = keyof251
+        downsemit = keyof251
+        semitfilter = [keyof251]
+        if semitone_distance != 0:
+            for i in range(semitone_distance - 1):
+                upsemit = (upsemit + 1) % 12
+                downsemit = (downsemit - 1) % 12
+                semitfilter.append(upsemit)
+                semitfilter.append(downsemit)
+
+        possiblekeys = [i for i in fifthfilter if i in semitfilter]
+        keyof251 = random.choice(possiblekeys)
+
+        chordnames[5:8] = keype2namelist(keyof251, typeof251)
+        basschordfilenames[5:8] = keype2filenamelist(keyof251, typeof251, tempo, 0)
+        pianochordfilenames[5:8] = keype2filenamelist(keyof251, typeof251, tempo, 1)
+
+    #SHOULD ALWAYS HAVE ENOUGH CHORDS AT THIS POINT (i.e. at least five chords are in chordnames)
 
     while playing:
 
-        bass_file = os.path.join(script_dir,"sounds", "full_progs",bass_name)
-        bass_sound = pygame.mixer.Sound(bass_file)
-        bass_length = bass_sound.get_length()
-        chord_length = bass_length/3
-        drawchords(chords)
-        time.sleep(chord_length)
-        chords = listcycle(chords)
-        chords[4] = chordsnow[1]
-        drawchords(chords)
-        time.sleep(chord_length)
-        chords = listcycle(chords)
-        chords[4] = chordsnow[2]
-        drawchords(chords)
-        time.sleep(chord_length)
+        drawchords(chordnames)
 
-        if not playing:
-            break
+        bass_name = basschordfilenames[1] + ".wav"
+        bass_file = os.path.join(script_dir,"sounds","single_chords","bass",bass_name)
+        bass_sound = pygame.mixer.Sound(bass_file)
+
+        piano_name = pianochordfilenames[1] + ".wav"
+        piano_file = os.path.join(script_dir,"sounds","single_chords","piano",piano_name)
+        piano_sound = pygame.mixer.Sound(piano_file)
+
+        chord_length = bass_sound.get_length()
 
         bass.play(bass_sound)
-        seed = random.randrange(0, 16384)
-        random.seed(seed)
-        typeof251 = random.randrange(0, howmanyallows)
-        keyof251 = random.randrange(0, 12)
-        bass_name = str(typeof251).zfill(2) + str(keyof251).zfill(2) + str(tempo).zfill(3) + "00.wav"
-        chordsnow = filepath2chords(bass_name)
-        chords = listcycle(chords)
-        chords[4] = chordsnow[0]
+        bass.set_volume(bass_volume/10)
+        piano.play(piano_sound)
+        piano.set_volume(piano_volume/10)
+
+        time.sleep(chord_length)
+
+        chordnames = listcycle(chordnames)
+        basschordfilenames = listcycle(basschordfilenames)
+        pianochordfilenames = listcycle(pianochordfilenames)
+
+        if chordnames[5] == "":
+
+            seed = random.randrange(0, 65535)
+            random.seed(seed)
+            typeof251 = random.choice(true_indices)
+
+            upfifth = keyof251
+            downfifth = keyof251
+            fifthfilter = [keyof251]
+            if fifth_distance != 0:
+                for i in range(fifth_distance - 1):
+                    upfifth = (upfifth + 7) % 12
+                    downfifth = (downfifth - 7) % 12
+                    fifthfilter.append(upfifth)
+                    fifthfilter.append(downfifth)
+
+            upsemit = keyof251
+            downsemit = keyof251
+            semitfilter = [keyof251]
+            if semitone_distance != 0:
+                for i in range(semitone_distance - 1):
+                    upsemit = (upsemit + 1) % 12
+                    downsemit = (downsemit - 1) % 12
+                    semitfilter.append(upsemit)
+                    semitfilter.append(downsemit)
+
+            possiblekeys = [i for i in fifthfilter if i in semitfilter]
+            keyof251 = random.choice(possiblekeys)
+
+            chordnames[5:8] = keype2namelist(keyof251, typeof251)
+            basschordfilenames[5:8] = keype2filenamelist(keyof251, typeof251, tempo, 0)
+            pianochordfilenames[5:8] = keype2filenamelist(keyof251, typeof251, tempo, 1)
 
 if __name__ == "__main__":
 
@@ -108,6 +311,9 @@ if __name__ == "__main__":
     RED = (235, 7, 7)
 
     notes = ["C", "D"+"\u266d", "D", "E"+"\u266d", "E", "F", "G"+"\u266d", "G", "A"+"\u266d", "A", "B"+"\u266d", "B"]
+    types = [[3,2,0], [4,2,1], [2,2,1], [3,2,1], [4,2,1], [2,0], [2,1]]
+    type2str = ["", "m", "7", "m7", "\u00f8" + "7"]
+    instr = ["Bass", "Piano"]
 
     surface = pygame.display.set_mode((1280,720))
 
@@ -116,49 +322,61 @@ if __name__ == "__main__":
     #font stuff (and draw initial chords MIGHT SCRAP)
     script_dir = os.path.dirname(__file__)
     font_path = os.path.join(script_dir,"fonts","cadman.ttf")
-    main_chord_font = pygame.font.Font(font_path, 160)
-    other_chord_font = pygame.font.Font(font_path, 100)
+
+    main_chord_font = pygame.font.Font(font_path, 140)
+    other_chord_font = pygame.font.Font(font_path, 80)
     menu_font = pygame.font.Font(font_path, 40)
+    volume_font = pygame.font.Font(font_path, 35)
+    instr_vol_font = pygame.font.Font(font_path, 30)
+
     options_text_black = menu_font.render("Options", 1, BLACK)
     quit_text_black = menu_font.render("Quit", 1, BLACK)
     back_text_black = menu_font.render("Back", 1, BLACK)
     options_text_white = menu_font.render("Options", 1, WHITE)
     quit_text_white = menu_font.render("Quit", 1, WHITE)
     back_text_white = menu_font.render("Back", 1, WHITE)
-    chord_past = other_chord_font.render("B", 1, BLACK)
-    chord_main = main_chord_font.render("D7", 1, RED)
-    chord_next = other_chord_font.render("G", 1, BLACK)
-    chord_next2 = other_chord_font.render("B"+"\u266d"+"7", 1, BLACK)
-    chord_next3 = other_chord_font.render("E"+"\u266d", 1, BLACK)
-    surface.blit(chord_past, chord_past.get_rect(center = (140,350)))
-    surface.blit(chord_main, chord_main.get_rect(center = (440,350)))
-    surface.blit(chord_next, chord_next.get_rect(center = (740,350)))
-    surface.blit(chord_next2, chord_next2.get_rect(center = (940,350)))
-    surface.blit(chord_next3, chord_next3.get_rect(center = (1140,350)))
+
     #dumb workaround
     white_rect_small = other_chord_font.render("GGG", 1, BLACK)
     white_rect_big = main_chord_font.render("GGG", 1, RED)
 
     #mixer stuff
     bass = pygame.mixer.Channel(0)
+    piano = pygame.mixer.Channel(1)
 
     #initial setting flags
+
     fifth_distance = 6
     semitone_distance = 6
-    tempo = 100
-    starting_key = (0, 0) #first element is what key center (C, Db etc), second element is mode (maj, min)
-    #REMEMBER TO SET A OPT MENU CHECK THAT AT LEAST ONE OF THE FOLLOWING IS TRUE
-    allow_major = True #Dm G C
-    allow_minor = False #Dhd G Cm
-    allow_secondary = False #D G Cm
-    allow_minsecondaryminor = False #Dm G Cm
-    allow_no2major = False #G C
-    allow_no2minor = False #G Cm
-    darkmode = False
-    seed = 0
 
-    #other flags
-    howmanyallows = 1
+    tempo = 100
+
+    starting_key = 0
+
+    random_starting_key_bool = True #true if random, false if not, gray out starting key menu in options if true. this should be a checkbox
+
+
+    global bass_volume
+    global piano_volume
+    global drums_volume
+    bass_volume = 7 #0 (mute) to 10
+    piano_volume = 7
+    drums_volume = 7
+
+    #REMEMBER TO SET A OPT MENU CHECK THAT AT LEAST ONE OF THE FOLLOWING IS TRUE
+    allowed_types = [True, False, False, False, False, False, False]
+    howmanyallows = sum(allowed_types)
+    #0 Dm G C
+    #1 Dhd G Cm
+    #2 D G Cm
+    #3 Dm G Cm
+    #4 D G C
+    #5 G C
+    #6 G Cm
+
+    darkmode = False
+
+    seed = 12213
 
     running = True
     playing = False
@@ -223,6 +441,10 @@ if __name__ == "__main__":
             pygame.draw.line(surface, MID_GREY, (1040,300),(1040,416))
             pygame.draw.line(surface, MID_GREY, (1240,300),(1240,416))
 
+            #volume
+            bassvolumebutton((40, 480), bass_volume, mouse, instr_vol_font, volume_font)
+            pianovolumebutton((40, 530), piano_volume, mouse, instr_vol_font, volume_font)
+
             for event in pygame.event.get():
 
                 if event.type == KEYDOWN:
@@ -253,6 +475,22 @@ if __name__ == "__main__":
                         playing = True
                         playthread = Thread(target = play, args = (seed,))
                         playthread.start()
+
+                    elif bassonplus_bool:
+
+                        bass_volume = min([10, bass_volume + 1])
+
+                    elif bassonminus_bool:
+
+                        bass_volume = max([0, bass_volume - 1])
+
+                    elif pianoonplus_bool:
+
+                        piano_volume = min([10, piano_volume + 1])
+
+                    elif pianoonminus_bool:
+
+                        piano_volume = max([0, piano_volume - 1])
 
                 elif event.type == QUIT:
 
@@ -360,6 +598,10 @@ if __name__ == "__main__":
             pygame.draw.line(surface, MID_GREY, (1040,300),(1040,416))
             pygame.draw.line(surface, MID_GREY, (1240,300),(1240,416))
 
+            #volume
+            bassvolumebutton((40, 480), bass_volume, mouse, instr_vol_font, volume_font)
+            pianovolumebutton((40, 530), piano_volume, mouse, instr_vol_font, volume_font)
+
             for event in pygame.event.get():
 
                 if event.type == KEYDOWN:
@@ -368,6 +610,7 @@ if __name__ == "__main__":
 
                         playing = False
                         bass.stop()
+                        piano.stop()
 
                     if event.key == K_ESCAPE:
 
@@ -388,6 +631,27 @@ if __name__ == "__main__":
 
                         playing = False
                         bass.stop()
+                        piano.stop()
+
+                    elif bassonplus_bool:
+
+                        bass_volume = min([10, bass_volume + 1])
+                        bass.set_volume(bass_volume/10)
+
+                    elif bassonminus_bool:
+
+                        bass_volume = max([0, bass_volume - 1])
+                        bass.set_volume(bass_volume/10)
+
+                    elif pianoonplus_bool:
+
+                        piano_volume = min([10, piano_volume + 1])
+                        piano.set_volume(piano_volume/10)
+
+                    elif pianoonminus_bool:
+
+                        piano_volume = max([0, piano_volume - 1])
+                        piano.set_volume(piano_volume/10)
 
                 elif event.type == QUIT:
 
