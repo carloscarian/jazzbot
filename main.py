@@ -17,7 +17,6 @@ from threading import Thread
 #TODO:
 #think of new nomenclature (don't really need the 01 for instrument at the end, so could use it for different versions of the same chord)
 #think of how to record better music (chord changes are too abrupt)
-#fix Bbm7 issue
 #start working on option menu .-.
 #pause button
 #record minor tonics and stuff
@@ -337,8 +336,8 @@ if __name__ == "__main__":
     back_text_white = menu_font.render("Back", 1, WHITE)
 
     #dumb workaround
-    white_rect_small = other_chord_font.render("GGG", 1, BLACK)
-    white_rect_big = main_chord_font.render("GGG", 1, RED)
+    white_rect_small = other_chord_font.render("B"+"\u266d"+"m7", 1, BLACK)
+    white_rect_big = main_chord_font.render("B"+"\u266d"+"m7", 1, RED)
 
     #mixer stuff
     bass = pygame.mixer.Channel(0)
