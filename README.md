@@ -17,5 +17,4 @@ Maybe:
 - Modal
 
 TODO: Make the transitions smoother
-TODO: fix a bug where playing immediately after stopping glitches out
 TODO: make a good readme
