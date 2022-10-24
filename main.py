@@ -9,17 +9,24 @@ from threading import Thread
 #
 
 #ISSUES:
-#if you stop, play() is still in sleep, if you play() again before sleep is over it glitches out
-
-#MINOR ISSUES:
-#Bbm7 doesn't fit in the small boxes
+#
 
 #TODO:
+#MAKE IT WORK WITH PROGS LONGER THAN 3 CHORDS!! (scalable ideally)
 #think of new nomenclature (don't really need the 01 for instrument at the end, so could use it for different versions of the same chord)
 #think of how to record better music (chord changes are too abrupt)
+    #IDEA: MAKE THE CHORD SOUNDFILES LONGER SO THERE'S MORE OVERLAP
 #start working on option menu .-.
 #pause button
 #record minor tonics and stuff
+
+#IDEAS:
+#make logic that chooses a bassline that makes sense with the previous one when changing keys
+
+#PLAN TO MAKE THINGS MORE SCALABLE:
+#make a list with all the 251 types
+#make the allowed_types list variable size (size should be how many types there are)
+#
 
 def randomtruefromboollist(lista, seed, howmanyallows):
     random.seed(seed)
@@ -243,6 +250,8 @@ def play(seed):
 
     while playing:
 
+        endloop = False
+
         drawchords(chordnames)
 
         bass_name = basschordfilenames[1] + ".wav"
@@ -253,14 +262,32 @@ def play(seed):
         piano_file = os.path.join(script_dir,"sounds","single_chords","piano",piano_name)
         piano_sound = pygame.mixer.Sound(piano_file)
 
-        chord_length = bass_sound.get_length()
-
         bass.play(bass_sound)
         bass.set_volume(bass_volume/10)
         piano.play(piano_sound)
         piano.set_volume(piano_volume/10)
 
-        time.sleep(chord_length)
+        #length in ms
+        chord_length = 1000*bass_sound.get_length()
+
+        time_chordstart = pygame.time.get_ticks()
+        while True:
+            time_now = pygame.time.get_ticks()
+            if time_now < time_chordstart + chord_length:
+                #print(7)
+                if event.type == KEYDOWN:
+                    if event.key == K_SPACE:
+                        endloop = True
+                        break
+                elif event.type == MOUSEBUTTONDOWN:
+                    if onstop_bool:
+                        endloop = True
+                        break
+            else:
+                break
+
+        if endloop == True:
+            break
 
         chordnames = listcycle(chordnames)
         basschordfilenames = listcycle(basschordfilenames)
@@ -304,13 +331,15 @@ if __name__ == "__main__":
     pygame.init()
     pygame.mixer.init()
 
+    clock = pygame.time.Clock()
+
     BLACK = (0,0,0)
     WHITE = (255,255,255)
     MID_GREY = (120,120,120)
     RED = (235, 7, 7)
 
     notes = ["C", "D"+"\u266d", "D", "E"+"\u266d", "E", "F", "G"+"\u266d", "G", "A"+"\u266d", "A", "B"+"\u266d", "B"]
-    types = [[3,2,0], [4,2,1], [2,2,1], [3,2,1], [4,2,1], [2,0], [2,1]]
+    types = [[3,2,0], [4,2,1], [2,2,1], [3,2,1], [2,2,1], [2,0], [2,1], [3,2,0,0], [4,2,1,1], [2,2,1,1], [3,2,1,1], [2,2,1,1]]
     type2str = ["", "m", "7", "m7", "\u00f8" + "7"]
     instr = ["Bass", "Piano"]
 
@@ -363,7 +392,8 @@ if __name__ == "__main__":
     drums_volume = 7
 
     #REMEMBER TO SET A OPT MENU CHECK THAT AT LEAST ONE OF THE FOLLOWING IS TRUE
-    allowed_types = [True, False, False, False, False, False, False]
+    allowed_types = len(types)*[False]
+    allowed_types[0] = True
     howmanyallows = sum(allowed_types)
     #0 Dm G C
     #1 Dhd G Cm
@@ -372,6 +402,11 @@ if __name__ == "__main__":
     #4 D G C
     #5 G C
     #6 G Cm
+    #7 Dm G C C
+    #8 Dhd G Cm Cm
+    #9 D G Cm Cm
+    #10 Dm G Cm Cm
+    #11 D G C C
 
     darkmode = False
 
